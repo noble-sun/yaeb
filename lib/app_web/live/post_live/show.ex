@@ -4,8 +4,10 @@ defmodule AppWeb.PostLive.Show do
   alias App.Blog
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(params, _session, socket) do
+    post = Blog.get_post_with_comments!(params["id"])
+
+    {:ok, stream(socket, :comments, post.comments)}
   end
 
   @impl true
@@ -16,7 +18,6 @@ defmodule AppWeb.PostLive.Show do
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:post, post)
-     |> assign(:comments, post.comments)
      |> assign(:editing_comment, nil)
      |> assign_new(:comment_changeset, fn ->
           to_form(Blog.change_comment(%Blog.Comment{}))
@@ -32,14 +33,12 @@ defmodule AppWeb.PostLive.Show do
     attrs = Map.merge(comment_params, %{"user_id" => user.id, "post_id" => post.id})
 
     case Blog.create_comment(attrs) do
-      {:ok, _comment} ->
-        comments = Blog.list_comments_for_post(post.id)
+      {:ok, comment} ->
+        comment = comment |> App.Repo.preload(:user)
         {:noreply, 
-          assign(
-            socket,
-            comments: comments,
-            comment_changeset: Blog.change_comment(%Blog.Comment{})
-          )
+          socket
+          |> stream_insert(:comments, comment)
+          |> assign(:comment_changeset, Blog.change_comment(%Blog.Comment{}))
         }
 
       {:error, changeset} ->
@@ -69,13 +68,14 @@ defmodule AppWeb.PostLive.Show do
   def handle_event("update_comment", %{"comment" => comment_params}, socket) do
     user = socket.assigns.current_user
     case Blog.update_comment(user, socket.assigns.editing_comment, comment_params) do
-      {:ok, _comment} ->
+      {:ok, comment} ->
+        comment = comment |> App.Repo.preload(:user)
         {:noreply,
           socket
           |> put_flash(:info, "Comment Updated")
           |> assign(:editing_comment, nil)
           |> assign(:comment_changeset, Blog.change_comment(%Blog.Comment{}))
-          |> assign_comments()
+          |> stream_insert(:comments, comment, at: -1)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -83,11 +83,20 @@ defmodule AppWeb.PostLive.Show do
     end
   end
 
+  def handle_event("delete", %{"id" => id}, socket) do
+    comment = Blog.get_comment!(id)
+
+    if comment.user_id == socket.assigns.current_user.id do
+      {:ok, _} = Blog.delete_comment(socket.assigns.current_user, comment)
+      {:noreply, stream_delete(socket, :comments, comment)}
+    else
+      {:noreply,
+        socket
+        |> put_flash(:error, "You can't delete another person's comment")
+      }
+    end
+  end
+
   defp page_title(:show), do: "Show Post"
   defp page_title(:edit), do: "Edit Post"
-
-  defp assign_comments(socket) do
-    post = Blog.get_post_with_comments!(socket.assigns.post.id)
-    assign(socket, :comments, post.comments)
-  end
 end

@@ -164,4 +164,12 @@ defmodule App.Blog do
       {:error, :unauthorized}
     end
   end
+
+  def delete_comment(%Accounts.User{id: user_id}, %Comment{} = comment) do
+    if comment.user_id == user_id do
+      Repo.delete(comment)
+    else
+      {:error, :unauthorized}
+    end
+  end
 end
