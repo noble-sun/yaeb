@@ -138,6 +138,8 @@ defmodule App.Blog do
     |> Repo.preload(:user)
   end
 
+  def get_comment!(id), do: Repo.get!(Comment, id)
+
   def create_comment(attrs \\ %{}) do
     %Comment{}
     |> Comment.changeset(attrs)
@@ -151,5 +153,15 @@ defmodule App.Blog do
   def get_post_with_comments!(id) do
     Repo.get!(Post, id)
     |> Repo.preload(comments: [:user])
+  end
+
+  def update_comment(%Accounts.User{id: user_id}, %Comment{} = comment, attrs) do
+    if comment.user_id == user_id do
+      comment
+      |> Comment.changeset(attrs)
+      |> Repo.update()
+    else
+      {:error, :unauthorized}
+    end
   end
 end

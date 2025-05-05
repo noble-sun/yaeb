@@ -21,18 +21,21 @@
     </strong>
     <%= comment.body %>
   </p>
+  <button :if={@current_user.id == comment.user_id} phx-click="edit_comment" phx-value-id={comment.id}>Edit</button>
 <% end %>
 
 <.simple_form :let={f}
   for={@comment_changeset}
   id="comment-form"
-  phx-submit="save_comment"
+  phx-submit={@editing_comment && "update_comment" || "save_comment"}
   as="comment"
 >
   <.input field={f[:body]} type="textarea" />
 
   <:actions>
-    <.button phx-disable-with="Saving...">Post Comment</.button>
+    <.button phx-disable-with="Saving...">
+      <%= if @editing_comment, do: "Update Comment", else: "Post Comment" %>
+    </.button>
   </:actions>
 </.simple_form>
 
