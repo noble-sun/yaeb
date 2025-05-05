@@ -50,8 +50,6 @@ defmodule AppWeb.PostLive.FormComponent do
   end
 
   defp save_post(socket, :edit, post_params) do
-    socket.assigns
-    |> IO.inspect(label: "----------------------- SAVE EDIT POST ------------------------")
     case Blog.update_post(socket.assigns.current_user, socket.assigns.post, post_params) do
       {:ok, post} ->
         notify_parent({:saved, post})

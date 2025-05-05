@@ -13,6 +13,29 @@
   <:item title="Body">{@post.body}</:item>
 </.list>
 
+<h3> Comments</h3>
+<%= for comment <- @comments do %>
+  <p>
+    <strong>
+      <%= comment.user.name %>:
+    </strong>
+    <%= comment.body %>
+  </p>
+<% end %>
+
+<.simple_form :let={f}
+  for={@comment_changeset}
+  id="comment-form"
+  phx-submit="save_comment"
+  as="comment"
+>
+  <.input field={f[:body]} type="textarea" />
+
+  <:actions>
+    <.button phx-disable-with="Saving...">Post Comment</.button>
+  </:actions>
+</.simple_form>
+
 <.back navigate={~p"/posts"}>Back to posts</.back>
 
 <.modal :if={@live_action == :edit} id="post-modal" show on_cancel={JS.patch(~p"/posts/#{@post}")}>

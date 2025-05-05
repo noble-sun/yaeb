@@ -6,6 +6,7 @@ defmodule App.Blog do
   import Ecto.Query, warn: false
   alias App.Repo
 
+  alias App.Blog.Comment
   alias App.Blog.Post
   alias App.Accounts
 
@@ -65,9 +66,6 @@ defmodule App.Blog do
 
   """
   def create_post(attrs \\ %{}, %Accounts.User{id: user_id}) do
-    attrs = Map.put(attrs, "user_id", user_id)
-    |> IO.inspect(label: "=================== ATTRS CREATE_POST ========================")
-
     %Post{}
     |> Post.changeset(attrs)
     |> Repo.insert()
@@ -86,10 +84,6 @@ defmodule App.Blog do
 
   """
   def update_post(%Accounts.User{id: user_id}, %Post{} = post, attrs) do
-    post
-    |> IO.inspect(label: "=================== POST ========================")
-    user_id
-    |> IO.inspect(label: "=================== USER_ID ========================")
     if post.user_id == user_id do
       post
       |> Post.changeset(attrs)
@@ -134,5 +128,27 @@ defmodule App.Blog do
   """
   def change_post(%Post{} = post, attrs \\ %{}) do
     Post.changeset(post, attrs)
+  end
+
+  def list_comments_for_post(post_id) do
+    Comment
+    |> where([c], c.post_id == ^post_id)
+    |> Repo.all()
+    |> Repo.preload(:user)
+  end
+
+  def create_comment(attrs \\ %{}) do
+    %Comment{}
+    |> Comment.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def change_comment(%Comment{} = comment, attrs \\ %{}) do
+    Comment.changeset(comment, attrs)
+  end
+
+  def get_post_with_comments!(id) do
+    Repo.get!(Post, id)
+    |> Repo.preload(comments: [:user])
   end
 end
