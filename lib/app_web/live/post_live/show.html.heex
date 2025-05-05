@@ -21,7 +21,14 @@
     </strong>
     <%= comment.body %>
   </p>
-  <button :if={@current_user.id == comment.user_id} phx-click="edit_comment" phx-value-id={comment.id}>Edit</button>
+  <a href="#comment-form">
+    <button :if={@current_user.id == comment.user_id}
+      phx-value-id={comment.id}
+      phx-click="edit_comment"
+    >
+      Edit
+    </button>
+  </a>
 <% end %>
 
 <.simple_form :let={f}
@@ -29,6 +36,7 @@
   id="comment-form"
   phx-submit={@editing_comment && "update_comment" || "save_comment"}
   as="comment"
+  id="comment-form"
 >
   <.input field={f[:body]} type="textarea" />
 
