@@ -36,6 +36,7 @@ defmodule App.Blog do
     Post
     |> where(user_id: ^user_id)
     |> Repo.all()
+    |> Repo.preload(:user)
   end
 
   @doc """
@@ -52,7 +53,7 @@ defmodule App.Blog do
       ** (Ecto.NoResultsError)
 
   """
-  def get_post!(id), do: Repo.get!(Post, id)
+  def get_post!(id), do: Repo.get!(Post, id) |> Repo.preload(:user)
 
   @doc """
   Creates a post.

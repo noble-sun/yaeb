@@ -65,8 +65,12 @@ defmodule AppWeb.PostLive.FormComponent do
   end
 
   defp save_post(socket, :new, post_params) do
-    case Blog.create_post(post_params, socket.assigns.current_user) do
+    user_id = socket.assigns.current_user.id
+    attrs = Map.merge(post_params, %{"user_id" => user_id })
+
+    case Blog.create_post(attrs, socket.assigns.current_user) do
       {:ok, post} ->
+        post = App.Repo.preload(post, :user)
         notify_parent({:saved, post})
 
         {:noreply,
