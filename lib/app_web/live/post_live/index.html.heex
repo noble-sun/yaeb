@@ -1,12 +1,3 @@
-<.header class="mb-8">
-  Listing Posts
-  <:actions>
-    <.link patch={~p"/posts/new"}>
-      <.button>New Post</.button>
-    </.link>
-  </:actions>
-</.header>
-
 <section id="test" class="w-[36rem]" phx-update="stream">
   <div :for={ {dom_id, post} <- @streams.posts }
     id={dom_id}
