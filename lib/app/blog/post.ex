@@ -8,7 +8,7 @@ defmodule App.Blog.Post do
     #field :user_id, :id
 
     belongs_to :user, App.Accounts.User
-    has_many :comments, App.Blog.Comment
+    has_many :comments, App.Blog.Comment, on_delete: :nilify_all
 
     timestamps(type: :utc_datetime)
   end
