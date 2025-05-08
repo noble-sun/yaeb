@@ -26,7 +26,11 @@
         group-hover:decoration-dashed"
       >{post.body}</p>
     </div>
-    <div class="text-sm flex justify-end gap-4">
+    <div class="text-sm flex justify-between gap-4 mt-4">
+      <span class="text-xs text-gray-400">
+        Posted <%= AppWeb.DateHelpers.relative_time(post.inserted_at) %>
+      </span>
+      <div>
       <.link :if={@current_user.id == post.user_id}
         patch={~p"/posts/#{post}/edit"}
         class="hover:underline"
@@ -36,6 +40,7 @@
         data-confirm="Are you sure?"
         class="hover:underline"
       >Delete</.link>
+    </div>
     </div>
     <hr class="border my-10 mx-2">
   </div>
