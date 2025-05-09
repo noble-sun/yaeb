@@ -25,6 +25,7 @@ defmodule AppWeb.PostLive.Show do
     }
   end
 
+  @impl true
   def handle_info({:delete_comment, id}, socket) do
     comment = Blog.get_comment!(id)
 
@@ -39,6 +40,7 @@ defmodule AppWeb.PostLive.Show do
     end
   end
 
+  def handle_info(_params, socket), do: {:noreply, socket}
 
   defp page_title(:show), do: "Show Post"
   defp page_title(:edit), do: "Edit Post"
