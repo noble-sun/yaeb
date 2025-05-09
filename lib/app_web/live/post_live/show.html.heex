@@ -17,7 +17,7 @@
     </.link>
   </section>
 
-  <span>{@post.body}</span>
+  <span class="whitespace-pre-line" >{@post.body}</span>
 
   <.modal :if={@live_action == :edit} id="post-modal" show on_cancel={JS.patch(~p"/posts/#{@post}")}>
     <.live_component

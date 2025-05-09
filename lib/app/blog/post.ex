@@ -5,7 +5,6 @@ defmodule App.Blog.Post do
   schema "posts" do
     field :title, :string
     field :body, :string
-    #field :user_id, :id
 
     belongs_to :user, App.Accounts.User
     has_many :comments, App.Blog.Comment, on_delete: :nilify_all
