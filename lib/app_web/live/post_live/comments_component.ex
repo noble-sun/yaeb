@@ -13,7 +13,7 @@ defmodule AppWeb.PostLive.CommentsComponent do
       <%= for {dom_id, comment} <- @streams.comments do %>
         <div id={dom_id} class="border-t p-4 first:border-none">
           <span><strong><%= comment.user.name %></strong></span>
-          <p><%= comment.body %></p>
+          <p class="whitespace-pre-line"><%= comment.body %></p>
           <div class="flex justify-between mt-4">
             <div class="flex gap-3">
               <a href="#comment-form">
