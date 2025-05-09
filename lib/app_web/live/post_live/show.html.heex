@@ -1,66 +1,71 @@
-<.header>
-  Post {@post.id}
-  <:subtitle>This is a post record from your database.</:subtitle>
-  <:actions>
-    <.link patch={~p"/posts/#{@post}/show/edit"} phx-click={JS.push_focus()} :if={@current_user.id == @post.user_id}>
-      <.button>Edit post</.button>
+<div class="w-[36rem]">
+  <.back navigate={~p"/posts"} outermost_component_class="mt-1 mb-4 hover:underline">Back to posts</.back>
+  <h1 class="text-4xl font-bold">
+    {@post.title}
+  </h1>
+
+  <section class="mb-10 mt-2 text-gray-600 gap-8 flex">
+    <span>{@post.user.name}</span>
+    <span><%=AppWeb.DateHelpers.format_datetime(@post.inserted_at)%></span>
+    <.link class="flex items-center gap-1 hover:underline"
+      patch={~p"/posts/#{@post}/show/edit"}
+      phx-click={JS.push_focus()}
+      :if={@current_user.id == @post.user_id}
+    >
+      <.icon name="hero-pencil" class="h-4 w-4"/>
+      <span>Edit post</span>
     </.link>
-  </:actions>
-</.header>
+  </section>
 
-<.list>
-  <:item title="Title">{@post.title}</:item>
-  <:item title="Body">{@post.body}</:item>
-</.list>
+  <span>{@post.body}</span>
 
-<h3> Comments</h3>
+  <h3> Comments</h3>
 
-<div id="comments" phx-update="stream">
-<%= for {dom_id, comment} <- @streams.comments do %>
-  <div id={dom_id}>
-    <p>
-      <strong><%= comment.user.name %>:</strong>
-      <%= comment.body %>
-    </p>
-    <a href="#comment-form">
+  <div id="comments" phx-update="stream">
+  <%= for {dom_id, comment} <- @streams.comments do %>
+    <div id={dom_id}>
+      <p>
+        <strong><%= comment.user.name %>:</strong>
+        <%= comment.body %>
+      </p>
+      <a href="#comment-form">
+        <button :if={@current_user.id == comment.user_id}
+          phx-value-id={comment.id}
+          phx-click="edit_comment"
+        > Edit </button>
+      </a>
       <button :if={@current_user.id == comment.user_id}
+        phx-click="delete"
         phx-value-id={comment.id}
-        phx-click="edit_comment"
-      > Edit </button>
-    </a>
-    <button :if={@current_user.id == comment.user_id}
-      phx-click="delete"
-      phx-value-id={comment.id}
-    > Delete </button>
+      > Delete </button>
+    </div>
+  <% end %>
   </div>
-<% end %>
+
+  <.simple_form :let={f}
+    for={@comment_changeset}
+    id="comment-form"
+    phx-submit={@editing_comment && "update_comment" || "save_comment"}
+    as="comment"
+  >
+    <.input field={f[:body]} type="textarea" />
+
+    <:actions>
+      <.button phx-disable-with="Saving...">
+        <%= if @editing_comment, do: "Update Comment", else: "Post Comment" %>
+      </.button>
+    </:actions>
+  </.simple_form>
+
+  <.modal :if={@live_action == :edit} id="post-modal" show on_cancel={JS.patch(~p"/posts/#{@post}")}>
+    <.live_component
+      module={AppWeb.PostLive.FormComponent}
+      id={@post.id}
+      title={@page_title}
+      action={@live_action}
+      post={@post}
+      current_user={@current_user}
+      patch={~p"/posts/#{@post}"}
+    />
+  </.modal>
 </div>
-
-<.simple_form :let={f}
-  for={@comment_changeset}
-  id="comment-form"
-  phx-submit={@editing_comment && "update_comment" || "save_comment"}
-  as="comment"
->
-  <.input field={f[:body]} type="textarea" />
-
-  <:actions>
-    <.button phx-disable-with="Saving...">
-      <%= if @editing_comment, do: "Update Comment", else: "Post Comment" %>
-    </.button>
-  </:actions>
-</.simple_form>
-
-<.back navigate={~p"/posts"}>Back to posts</.back>
-
-<.modal :if={@live_action == :edit} id="post-modal" show on_cancel={JS.patch(~p"/posts/#{@post}")}>
-  <.live_component
-    module={AppWeb.PostLive.FormComponent}
-    id={@post.id}
-    title={@page_title}
-    action={@live_action}
-    post={@post}
-    current_user={@current_user}
-    patch={~p"/posts/#{@post}"}
-  />
-</.modal>

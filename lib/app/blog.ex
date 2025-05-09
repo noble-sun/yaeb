@@ -153,7 +153,7 @@ defmodule App.Blog do
 
   def get_post_with_comments!(id) do
     Repo.get!(Post, id)
-    |> Repo.preload(comments: [:user])
+    |> Repo.preload([:user, comments: [:user]])
   end
 
   def update_comment(%Accounts.User{id: user_id}, %Comment{} = comment, attrs) do
