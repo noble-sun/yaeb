@@ -19,44 +19,6 @@
 
   <span>{@post.body}</span>
 
-  <h3> Comments</h3>
-
-  <div id="comments" phx-update="stream">
-  <%= for {dom_id, comment} <- @streams.comments do %>
-    <div id={dom_id}>
-      <p>
-        <strong><%= comment.user.name %>:</strong>
-        <%= comment.body %>
-      </p>
-      <a href="#comment-form">
-        <button :if={@current_user.id == comment.user_id}
-          phx-value-id={comment.id}
-          phx-click="edit_comment"
-        > Edit </button>
-      </a>
-      <button :if={@current_user.id == comment.user_id}
-        phx-click="delete"
-        phx-value-id={comment.id}
-      > Delete </button>
-    </div>
-  <% end %>
-  </div>
-
-  <.simple_form :let={f}
-    for={@comment_changeset}
-    id="comment-form"
-    phx-submit={@editing_comment && "update_comment" || "save_comment"}
-    as="comment"
-  >
-    <.input field={f[:body]} type="textarea" />
-
-    <:actions>
-      <.button phx-disable-with="Saving...">
-        <%= if @editing_comment, do: "Update Comment", else: "Post Comment" %>
-      </.button>
-    </:actions>
-  </.simple_form>
-
   <.modal :if={@live_action == :edit} id="post-modal" show on_cancel={JS.patch(~p"/posts/#{@post}")}>
     <.live_component
       module={AppWeb.PostLive.FormComponent}
@@ -68,4 +30,14 @@
       patch={~p"/posts/#{@post}"}
     />
   </.modal>
+
+  <.live_component
+    module={AppWeb.PostLive.CommentsComponent}
+    id="comments-component"
+    streams={@streams}
+    current_user={@current_user}
+    editing_comment={@editing_comment}
+    comment_changeset={@comment_changeset}
+    post={@post}
+  />
 </div>
