@@ -1,8 +1,8 @@
 <header class="relative px-4 sm:px-6 lg:px-8 bg-white">
-  <div class="reletive flex items-center border-b border-zinc-100 py-3 text-sm">
+  <div class="reletive flex items-center border-b border-zinc-100 py-8 text-sm">
     <div class="absolute left-0flex items-center gap-4">
       <a href="/">
-        <img src={~p"/images/logo.svg"} width="36" />
+        <img src={~p"/images/logo.svg"} width="48" />
       </a>
     </div>
     <div class="flex flex-1 items-center justify-center gap-4 font-semibold leading-6 text-zinc-900 text-xl">
@@ -12,10 +12,42 @@
       <a href={~p"/posts"} class="hover:text-zinc-700">
         My Posts
       </a>
-      <div class="absolute right-0 mr-8">
-        <.link patch={~p"/posts/new"}>
-          <.button>New Post</.button>
-        </.link>
+      <div class="absolute right-0 mr-8 gap-4 flex items-center">
+        <%= if @current_user do %>
+          <.link patch={~p"/posts/new"}
+            class="bg-transparent text-[0.8125rem] leading-6 text-zinc-900 font-semibold
+              hover:text-zinc-700 hover:border rounded-md p-1 px-2 flex items-center"
+          >
+            <.icon name="hero-pencil-square-solid" class="w-4 h-4 mr-[2px]"/>
+            <span>New Post</span>
+          </.link>
+          <.link
+            href={~p"/users/settings"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Settings
+          </.link>
+          <.link
+            href={~p"/users/log_out"}
+            method="delete"
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Log out
+          </.link>
+        <% else %>
+          <.link
+            href={~p"/users/register"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Register
+          </.link>
+          <.link
+            href={~p"/users/log_in"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Log in
+          </.link>
+        <% end %>
       </div>
     </div>
   </div>
