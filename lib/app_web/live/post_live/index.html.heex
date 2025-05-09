@@ -1,4 +1,6 @@
-<section id="test" class="w-[36rem]" phx-update="stream">
+<h1 class="text-3xl font-bold mb-10 flex justify-center">{@page_title}</h1>
+
+<section id="posts" class="w-[36rem]" phx-update="stream">
   <div :for={ {dom_id, post} <- @streams.posts }
     id={dom_id}
   >

@@ -46,7 +46,7 @@ defmodule AppWeb.PostLive.Index do
     posts = Blog.list_user_posts(socket.assigns.current_user)
 
     socket
-    |> assign(:page_title, "Listing Posts")
+    |> assign(:page_title, "My Posts")
     |> assign(:post, nil)
     |> stream(:posts, [], reset: true)
     |> stream(:posts, posts)
