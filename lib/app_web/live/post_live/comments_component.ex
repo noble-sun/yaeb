@@ -6,49 +6,53 @@ defmodule AppWeb.PostLive.CommentsComponent do
   @impl true
   def render(assigns) do
     ~H"""
-  <div>
-  <h3> Comments</h3>
+    <div class="mt-12">
+      <h2 class="text-lg font-semibold"> Comments</h2>
 
-  <div id="comments" phx-update="stream">
-  <%= for {dom_id, comment} <- @streams.comments do %>
-    <div id={dom_id}>
-      <p>
-        <strong><%= comment.user.name %>:</strong>
-        <%= comment.body %>
-      </p>
-      <a href="#comment-form">
-        <button :if={@current_user.id == comment.user_id}
-          phx-value-id={comment.id}
-          phx-click="edit_comment"
-          phx-target={@myself}
-        > Edit </button>
-      </a>
-      <button :if={@current_user.id == comment.user_id}
-        phx-click="delete"
-        phx-value-id={comment.id}
+      <div id="comments" phx-update="stream" class="grid divide-gray-300">
+      <%= for {dom_id, comment} <- @streams.comments do %>
+        <div id={dom_id} class="border-t p-4 first:border-none">
+          <span><strong><%= comment.user.name %></strong></span>
+          <p><%= comment.body %></p>
+          <div class="flex justify-between mt-4">
+            <div class="flex gap-3">
+              <a href="#comment-form">
+                <button :if={@current_user.id == comment.user_id}
+                  phx-value-id={comment.id}
+                  phx-click="edit_comment"
+                  phx-target={@myself}
+                > Edit </button>
+              </a>
+              <button :if={@current_user.id == comment.user_id}
+                phx-click="delete"
+                phx-value-id={comment.id}
+                phx-target={@myself}
+              > Delete </button>
+            </div>
+              <span class="text-xs text-gray-400">
+                <%= AppWeb.DateHelpers.relative_time(comment.inserted_at) %>
+              </span>
+          </div>
+        </div>
+      <% end %>
+      </div>
+
+      <.simple_form :let={f}
+        for={@comment_changeset}
+        id="comment-form"
+        phx-submit={@editing_comment && "update_comment" || "save_comment"}
         phx-target={@myself}
-      > Delete </button>
+        as="comment"
+      >
+        <.input field={f[:body]} type="textarea" placeholder="Write your comment here..." />
+
+        <:actions>
+          <.button phx-disable-with="Saving...">
+            <%= if @editing_comment, do: "Update Comment", else: "Post Comment" %>
+          </.button>
+        </:actions>
+      </.simple_form>
     </div>
-  <% end %>
-  </div>
-
-  <.simple_form :let={f}
-    for={@comment_changeset}
-    id="comment-form"
-    phx-submit={@editing_comment && "update_comment" || "save_comment"}
-    phx-target={@myself}
-    as="comment"
-  >
-    <.input field={f[:body]} type="textarea" />
-
-    <:actions>
-      <.button phx-disable-with="Saving...">
-        <%= if @editing_comment, do: "Update Comment", else: "Post Comment" %>
-      </.button>
-    </:actions>
-  </.simple_form>
-  </div>
-
     """
   end
 
